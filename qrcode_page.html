@@ -1,0 +1,833 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Central de Recursos Hídricos</title>
+
+<style>
+:root {
+    --ink: #1b2b2b;
+    --muted: #5f6f70;
+    --paper: #ffffff;
+    --mist: #f4f7f6;
+    --water: #007c89;
+    --water-dark: #003c50;
+    --line: #d7e0df;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Segoe UI", Arial, sans-serif;
+    background: var(--mist);
+    color: var(--ink);
+}
+
+.hero {
+    background:
+        linear-gradient(rgba(0, 60, 80, 0.66), rgba(0, 60, 80, 0.66)),
+        url("https://images.unsplash.com/photo-1507525428034-b723cf961d3e") center/cover;
+    color: white;
+    text-align: center;
+    padding: 80px 20px;
+}
+
+.hero h1 {
+    font-size: clamp(30px, 6vw, 42px);
+    margin: 0 0 10px;
+}
+
+.hero p {
+    font-size: clamp(16px, 3vw, 18px);
+    max-width: 760px;
+    margin: auto;
+    line-height: 1.45;
+}
+
+.container {
+    max-width: 1080px;
+    margin: -40px auto 40px;
+    padding: 20px;
+}
+
+.card {
+    background: var(--paper);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 24px rgba(0, 0, 0, 0.1);
+}
+
+.icon {
+    width: 60px;
+    min-width: 60px;
+    height: 60px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--water-dark);
+}
+
+.blue { background: #dcefff; }
+.green { background: #e3f6e8; }
+.teal { background: #e0f7f7; }
+.purple { background: #efe6ff; }
+.orange { background: #fff3e0; }
+.sand { background: #f5ebd6; }
+
+.card-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.card-content h3 {
+    margin: 0;
+    font-size: 20px;
+}
+
+.card-content p {
+    margin: 5px 0 10px;
+    color: var(--muted);
+    font-size: 14px;
+    line-height: 1.45;
+}
+
+.links a {
+    display: block;
+    background: #f7f9f9;
+    padding: 12px 14px;
+    border-radius: 8px;
+    text-decoration: none;
+    color: var(--ink);
+    margin-bottom: 6px;
+    transition: background 0.2s ease, color 0.2s ease;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.links a:hover,
+.links a:focus {
+    background: #e6f4f1;
+    color: var(--water-dark);
+}
+
+.links a.pdf::after {
+    content: " abrir PDF";
+    color: var(--water);
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.links a.external::after {
+    content: " abrir link";
+    color: var(--water);
+    font-size: 12px;
+    font-weight: 700;
+    margin-left: 6px;
+}
+
+.basin-card {
+    align-items: flex-start;
+}
+
+.basin-card .icon {
+    margin-top: 2px;
+}
+
+.basin-layout {
+    display: grid;
+    grid-template-columns: minmax(320px, 1fr) 320px;
+    gap: 18px;
+    margin-top: 16px;
+    align-items: start;
+}
+
+.map-wrap {
+    position: relative;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fbfdfd;
+    padding: 14px;
+    min-height: 520px;
+}
+
+.map-title {
+    margin: 0 0 8px;
+    font-size: 18px;
+    text-transform: uppercase;
+    letter-spacing: 0;
+    color: var(--water-dark);
+    text-align: center;
+}
+
+.map-help {
+    margin: 0 0 12px;
+    color: var(--muted);
+    font-size: 13px;
+    text-align: center;
+}
+
+.basin-map {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 640 / 780;
+}
+
+.basin-region {
+    cursor: pointer;
+    stroke: #263635;
+    stroke-width: 2;
+    outline: none;
+    transition: filter 0.2s ease, opacity 0.2s ease, stroke-width 0.2s ease;
+}
+
+.basin-region:hover,
+.basin-region:focus,
+.basin-region.active {
+    filter: brightness(1.06) saturate(1.12);
+    stroke-width: 4;
+}
+
+.map-label {
+    font-size: 19px;
+    font-weight: 800;
+    fill: #1e2a2b;
+    paint-order: stroke;
+    stroke: white;
+    stroke-width: 5px;
+    stroke-linejoin: round;
+    pointer-events: none;
+    text-anchor: middle;
+}
+
+.legend {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    margin-top: 12px;
+    font-size: 13px;
+}
+
+.legend span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 0;
+}
+
+.swatch {
+    width: 16px;
+    height: 16px;
+    border: 1px solid #74807f;
+    border-radius: 3px;
+    flex: 0 0 auto;
+}
+
+.contact-panel {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: #fbfdfd;
+    padding: 16px;
+    position: sticky;
+    top: 12px;
+}
+
+.contact-panel h4 {
+    margin: 0 0 6px;
+    color: var(--water-dark);
+    font-size: 18px;
+}
+
+.contact-panel dl {
+    margin: 14px 0 0;
+}
+
+.contact-panel dt {
+    color: var(--muted);
+    font-size: 12px;
+    font-weight: 700;
+    margin-top: 12px;
+    text-transform: uppercase;
+}
+
+.contact-panel dd {
+    margin: 4px 0 0;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+
+.contact-panel a {
+    color: var(--water-dark);
+    font-weight: 700;
+}
+
+.popup {
+    position: absolute;
+    z-index: 5;
+    width: min(320px, calc(100% - 28px));
+    left: 18px;
+    top: 120px;
+    background: white;
+    border: 1px solid #cbd7d6;
+    border-radius: 8px;
+    box-shadow: 0 14px 38px rgba(0, 0, 0, 0.18);
+    padding: 14px 44px 14px 14px;
+}
+
+.popup[hidden] {
+    display: none;
+}
+
+.popup h4 {
+    margin: 0 0 8px;
+    color: #003f8f;
+    font-size: 16px;
+}
+
+.popup p {
+    margin: 6px 0;
+    font-size: 13px;
+    color: var(--ink);
+}
+
+.popup a {
+    color: #064da1;
+    font-weight: 700;
+}
+
+.popup button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    border-radius: 6px;
+    background: #eef3f3;
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 20px;
+    line-height: 1;
+}
+
+.actions-section {
+    background: var(--paper);
+    border: 1px solid rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 20px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+}
+
+.actions-section h2 {
+    margin: 0 0 6px;
+    color: var(--water-dark);
+    font-size: 24px;
+}
+
+.actions-section p {
+    margin: 0 0 16px;
+    color: var(--muted);
+    font-size: 14px;
+}
+
+.carousel {
+    position: relative;
+    overflow: hidden;
+    border-radius: 8px;
+    background: #eef4f4;
+}
+
+.carousel-track {
+    display: flex;
+    transition: transform 0.35s ease;
+}
+
+.carousel-slide {
+    min-width: 100%;
+    aspect-ratio: 16 / 9;
+    background: #e8eeee;
+}
+
+.carousel-slide img {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: contain;
+}
+
+.carousel-button {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.92);
+    color: var(--water-dark);
+    cursor: pointer;
+    font-size: 28px;
+    line-height: 1;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.18);
+}
+
+.carousel-button:hover,
+.carousel-button:focus {
+    background: white;
+}
+
+.carousel-button.prev {
+    left: 12px;
+}
+
+.carousel-button.next {
+    right: 12px;
+}
+
+.carousel-dots {
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 12px;
+}
+
+.carousel-dot {
+    width: 10px;
+    height: 10px;
+    border: 0;
+    border-radius: 50%;
+    background: #b7c7c6;
+    cursor: pointer;
+}
+
+.carousel-dot.active {
+    background: var(--water);
+}
+
+.footer {
+    text-align: center;
+    padding: 20px;
+    color: #555;
+    font-size: 14px;
+}
+
+@media (max-width: 820px) {
+    .basin-layout {
+        grid-template-columns: 1fr;
+    }
+
+    .contact-panel {
+        position: static;
+    }
+
+    .map-wrap {
+        min-height: 0;
+    }
+}
+
+@media (max-width: 640px) {
+    .hero {
+        padding: 56px 18px;
+    }
+
+    .card {
+        display: block;
+        padding: 18px;
+    }
+
+    .icon {
+        margin-bottom: 14px;
+    }
+
+    .links a {
+        padding: 14px;
+        font-size: 15px;
+    }
+
+    .legend {
+        grid-template-columns: 1fr;
+    }
+
+    .popup {
+        position: static;
+        width: 100%;
+        margin-top: 12px;
+    }
+
+    .carousel-slide {
+        aspect-ratio: 4 / 3;
+    }
+
+    .carousel-button {
+        width: 36px;
+        height: 36px;
+        font-size: 24px;
+    }
+}
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+    <h1>3º Fórum Brasil das Águas</h1>
+    <p>Conheça as atividades da Superintendência de Recursos Hídricos. Acesse documentos, orientações e normas para gestão sustentável da água.</p>
+</div>
+
+<main class="container">
+    <section class="card">
+        <div class="icon blue" aria-hidden="true">DOC</div>
+        <div class="card-content">
+            <h3>Outorga e Cadastro de Usuários</h3>
+            <p>Manual com orientações para usuários de recursos hídricos no Maranhão.</p>
+            <div class="links">
+                <a class="pdf" href="Manual de Usuários Rec Hídricos MA_2022.pdf" target="_blank" rel="noopener">Manual de Usuários de Recursos Hídricos MA 2022</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="icon green" aria-hidden="true">OK</div>
+        <div class="card-content">
+            <h3>Inexigibilidade de Outorga</h3>
+            <p>Cartilha para entender quando o uso da água pode dispensar outorga.</p>
+            <div class="links">
+                <a class="pdf" href="CARTILHA PARA INEXIGIBILIDADE DE OUTORGA DE DIREITO DE USO.pdf" target="_blank" rel="noopener">Cartilha para Inexigibilidade de Outorga de Direito de Uso</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="icon teal" aria-hidden="true">H2O</div>
+        <div class="card-content">
+            <h3>Águas Subterrâneas</h3>
+            <p>Material educativo sobre proteção, uso e gestão das águas subterrâneas.</p>
+            <div class="links">
+                <a class="pdf" href="Cartilha - Águas subterrâneas  .pdf" target="_blank" rel="noopener">Cartilha - Águas Subterrâneas</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="icon purple" aria-hidden="true">LEI</div>
+        <div class="card-content">
+            <h3>Legislação e Normas</h3>
+            <p>Portarias, resoluções e diretrizes aplicáveis aos recursos hídricos.</p>
+            <div class="links">
+                <a class="pdf" href="PORTARIA 069 DE 15 DE JUNHO DE 2020.pdf" target="_blank" rel="noopener">Portaria 069 de 15 de Junho de 2020</a>
+                <a class="pdf" href="DECRETO 34.847 2019 Atual (1).pdf" target="_blank" rel="noopener">Decreto 34.847/2019 Atual</a>
+                <a class="pdf" href="RESOLUÇÃO CONERH Nº 0572019..pdf" target="_blank" rel="noopener">Resolução CONERH nº 057/2019</a>
+                <a class="pdf" href="RESOLUÇÃO CONERH Nº 151.2024 - Instituição de Comitês.pdf" target="_blank" rel="noopener">Resolução CONERH nº 151/2024 - Instituição de Comitês</a>
+                <a class="pdf" href="17762_texto_integral PROJETO DE LEI COMPLEMENTAR.pdf" target="_blank" rel="noopener">Projeto de Lei Complementar - Texto Integral</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="card">
+        <div class="icon orange" aria-hidden="true">WEB</div>
+        <div class="card-content">
+            <h3>Plataformas externas</h3>
+            <p>Acesso ao sistema SIGLA da SEMA Maranhão.</p>
+            <div class="links">
+                <a class="external" href="https://sigla.sema.ma.gov.br/sigla/" target="_blank" rel="noopener">Abrir SIGLA/SEMA</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="card basin-card">
+        <div class="icon sand" aria-hidden="true">CBH</div>
+        <div class="card-content">
+            <h3>Comitês de Bacias Hidrográficas do Estado do Maranhão</h3>
+            <p>Mapa interativo limitado aos comitês de bacias hidrográficas. Clique em uma região para consultar o contato do representante.</p>
+
+            <div class="basin-layout">
+                <div class="map-wrap">
+                    <h4 class="map-title">Comitês de Bacias Hidrográficas</h4>
+                    <p class="map-help">Selecione uma bacia no mapa.</p>
+                    <svg class="basin-map" viewBox="0 0 640 780" role="img" aria-labelledby="mapTitle mapDesc">
+                        <title id="mapTitle">Mapa dos Comitês de Bacias Hidrográficas do Maranhão</title>
+                        <desc id="mapDesc">Representação interativa das regiões dos comitês CBH Turiaçu, Pindaré, Preguiças e Periá, Itapecuru, Mearim e Grajaú, Munim, Parnaíba, Balsas e Afluentes Maranhenses do Alto Parnaíba.</desc>
+
+                        <polygon class="basin-region" data-basin="turiacu" tabindex="0" fill="#f8df86" points="228,35 278,72 272,150 312,188 271,245 260,332 178,351 132,302 151,220 118,161 170,112" />
+                        <polygon class="basin-region" data-basin="pindare" tabindex="0" fill="#f2a05b" points="278,72 365,112 394,198 359,286 286,323 260,332 271,245 312,188 272,150" />
+                        <polygon class="basin-region" data-basin="preguicas" tabindex="0" fill="#f1c6c7" points="394,198 461,165 542,194 509,282 438,290 359,286" />
+                        <polygon class="basin-region" data-basin="itapecuru" tabindex="0" fill="#bce7e8" points="542,194 604,225 574,356 591,488 512,565 432,511 438,290 509,282" />
+                        <polygon class="basin-region active" data-basin="mearim" tabindex="0" fill="#c9c5ea" points="178,351 260,332 286,323 321,399 295,511 244,582 158,548 116,451" />
+                        <polygon class="basin-region" data-basin="munim" tabindex="0" fill="#cddf8d" points="321,399 286,323 359,286 438,290 432,511 353,587 295,511" />
+                        <polygon class="basin-region" data-basin="parnaiba" tabindex="0" fill="#e7d8c3" points="353,587 432,511 512,565 568,661 448,712 320,676 244,582 295,511" />
+                        <polygon class="basin-region" data-basin="balsas" tabindex="0" fill="#61d4d4" points="158,548 244,582 320,676 285,756 195,733 137,657 108,596" />
+
+                        <text class="map-label" x="210" y="165">CBH</text>
+                        <text class="map-label" x="210" y="190">Turiaçu</text>
+                        <text class="map-label" x="327" y="205">CBH</text>
+                        <text class="map-label" x="327" y="230">Pindaré</text>
+                        <text class="map-label" x="455" y="225">CBH</text>
+                        <text class="map-label" x="455" y="250">Preguiças</text>
+                        <text class="map-label" x="455" y="275">e Periá</text>
+                        <text class="map-label" x="508" y="372">CBH</text>
+                        <text class="map-label" x="508" y="397">Itapecuru</text>
+                        <text class="map-label" x="221" y="436">CBH</text>
+                        <text class="map-label" x="221" y="461">Mearim</text>
+                        <text class="map-label" x="221" y="486">e Grajaú</text>
+                        <text class="map-label" x="363" y="436">CBH</text>
+                        <text class="map-label" x="363" y="461">Munim</text>
+                        <text class="map-label" x="392" y="624">CBH</text>
+                        <text class="map-label" x="392" y="649">Parnaíba</text>
+                        <text class="map-label" x="218" y="650">CBH</text>
+                        <text class="map-label" x="218" y="675">Balsas e Afluentes</text>
+                        <text class="map-label" x="218" y="700">Maranhenses</text>
+                    </svg>
+
+                    <div class="popup" id="basinPopup" role="dialog" aria-live="polite">
+                        <button type="button" id="closePopup" aria-label="Fechar contato">×</button>
+                        <h4 id="popupTitle"></h4>
+                        <p id="popupRole"></p>
+                        <p id="popupEmail"></p>
+                        <p id="popupPhone"></p>
+                    </div>
+
+                    <div class="legend" aria-label="Legenda dos comitês">
+                        <span><i class="swatch" style="background:#c9c5ea"></i>CBH Mearim e Grajaú</span>
+                        <span><i class="swatch" style="background:#cddf8d"></i>CBH Munim</span>
+                        <span><i class="swatch" style="background:#e7d8c3"></i>CBH Parnaíba</span>
+                        <span><i class="swatch" style="background:#61d4d4"></i>CBH Balsas e Afluentes</span>
+                        <span><i class="swatch" style="background:#f8df86"></i>CBH Turiaçu</span>
+                        <span><i class="swatch" style="background:#f2a05b"></i>CBH Pindaré</span>
+                        <span><i class="swatch" style="background:#f1c6c7"></i>CBH Preguiças e Periá</span>
+                        <span><i class="swatch" style="background:#bce7e8"></i>CBH Itapecuru</span>
+                    </div>
+                </div>
+
+                <aside class="contact-panel" aria-live="polite">
+                    <h4 id="contactTitle">CBH Mearim e Grajaú</h4>
+                    <p id="contactSubtitle">Contato do representante selecionado.</p>
+                    <dl>
+                        <dt>Representante</dt>
+                        <dd id="contactLeader">Francisco Pereira da Silva Neto</dd>
+                        <dt>E-mail</dt>
+                        <dd id="contactEmail"><a href="mailto:franciscobiologiagrajau@gmail.com">franciscobiologiagrajau@gmail.com</a> / <a href="mailto:cbhriomearim.grajau@gmail.com">cbhriomearim.grajau@gmail.com</a></dd>
+                        <dt>Telefone</dt>
+                        <dd id="contactPhone"><a href="tel:+5599991823801">(99) 9918-23801</a></dd>
+                    </dl>
+                </aside>
+            </div>
+        </div>
+    </section>
+
+    <section class="actions-section" aria-labelledby="actionsTitle">
+        <h2 id="actionsTitle">Registro de nossas ações</h2>
+        <p>Momentos e atividades registrados durante nossas ações.</p>
+        <div class="carousel" data-carousel>
+            <div class="carousel-track">
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 16.00.46 (1).jpeg" alt="Registro de ação 1"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 15.50.44.jpeg" alt="Registro de ação 2"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 15.50.44 (1).jpeg" alt="Registro de ação 3"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 16.00.46.jpeg" alt="Registro de ação 4"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 16.00.46 (2).jpeg" alt="Registro de ação 5"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 16.00.47.jpeg" alt="Registro de ação 6"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 16.04.00.jpeg" alt="Registro de ação 7"></div>
+                <div class="carousel-slide"><img src="WhatsApp Image 2026-04-28 at 16.04.00 (1).jpeg" alt="Registro de ação 8"></div>
+            </div>
+            <button class="carousel-button prev" type="button" aria-label="Imagem anterior">‹</button>
+            <button class="carousel-button next" type="button" aria-label="Próxima imagem">›</button>
+        </div>
+        <div class="carousel-dots" aria-label="Selecionar imagem do carrossel"></div>
+    </section>
+</main>
+
+<div class="footer">
+    Água é vida. Preservar hoje é garantir o futuro.
+</div>
+
+<script>
+const basinContacts = {
+    mearim: {
+        name: "CBH Mearim e Grajaú",
+        role: "Presidente",
+        leader: "Francisco Pereira da Silva Neto",
+        emails: ["franciscobiologiagrajau@gmail.com", "cbhriomearim.grajau@gmail.com"],
+        phones: ["(99) 9918-23801"]
+    },
+    munim: {
+        name: "CBH Munim",
+        role: "Presidenta",
+        leader: "Márcio Roberto dos Santos Teixeira",
+        emails: ["comitemunim@gmail.com", "marciormsm@gmail.com"],
+        phones: ["(98) 97007-6855"]
+    },
+    parnaiba: {
+        name: "CBH Parnaíba",
+        role: "Presidente",
+        leader: "Felipe Gomes da Silva",
+        emails: ["diretoria.cbhparnaiba@gmail.com"],
+        phones: ["(86) 99829-9900"]
+    },
+    balsas: {
+        name: "CBH Balsas e Afluentes Maranhenses do Alto Parnaíba",
+        role: "Presidenta Interina",
+        leader: "Ana Paula da Silva de Souza Vaz",
+        emails: [],
+        phones: ["(99) 98520-9339"]
+    },
+    turiacu: {
+        name: "CBH Turiaçu",
+        role: "Presidente",
+        leader: "Marlon Ribeiro",
+        emails: ["marlon.ribeiro.advogado@gmail.com", "comitebaciaturi@gmail.com"],
+        phones: ["(98) 98258-4252"]
+    },
+    pindare: {
+        name: "CBH Pindaré",
+        role: "Presidente",
+        leader: "Nonato (Raimundo Nonato Moraes Andrade)",
+        emails: ["baciadopindare@gmail.com", "morandrade@yahoo.com.br"],
+        phones: ["(98) 98156-7533"]
+    },
+    preguicas: {
+        name: "CBH Preguiças e Periá",
+        role: "Presidente",
+        leader: "Francisco das Chagas Sousa",
+        emails: ["cbhriopreguicasperia@gmail.com"],
+        phones: ["(98) 98486-2732", "(98) 8778-3503"]
+    },
+    itapecuru: {
+        name: "CBH Itapecuru",
+        role: "Presidente",
+        leader: "Maria de Jesus Melo Soares",
+        emails: ["cbh.itapecuru.ma@gmail.com", "mjesusmelosoares71@icloud.com"],
+        phones: ["(99) 8414-5320"]
+    }
+};
+
+const regions = document.querySelectorAll(".basin-region");
+const popup = document.getElementById("basinPopup");
+const closePopup = document.getElementById("closePopup");
+const popupTitle = document.getElementById("popupTitle");
+const popupRole = document.getElementById("popupRole");
+const popupEmail = document.getElementById("popupEmail");
+const popupPhone = document.getElementById("popupPhone");
+const contactTitle = document.getElementById("contactTitle");
+const contactSubtitle = document.getElementById("contactSubtitle");
+const contactLeader = document.getElementById("contactLeader");
+const contactEmail = document.getElementById("contactEmail");
+const contactPhone = document.getElementById("contactPhone");
+
+function emailLinks(emails) {
+    if (!emails.length) return "E-mail não informado";
+    return emails.map((email) => `<a href="mailto:${email}">${email}</a>`).join(" / ");
+}
+
+function phoneLinks(phones) {
+    return phones.map((phone) => {
+        const clean = phone.replace(/\D/g, "");
+        return `<a href="tel:+55${clean}">${phone}</a>`;
+    }).join(" / ");
+}
+
+function selectBasin(key, target) {
+    const data = basinContacts[key];
+    if (!data) return;
+
+    regions.forEach((region) => region.classList.toggle("active", region.dataset.basin === key));
+
+    contactTitle.textContent = data.name;
+    contactSubtitle.textContent = "Contato do representante selecionado.";
+    contactLeader.textContent = `${data.role}: ${data.leader}`;
+    contactEmail.innerHTML = emailLinks(data.emails);
+    contactPhone.innerHTML = phoneLinks(data.phones);
+
+    popupTitle.textContent = data.name;
+    popupRole.textContent = `${data.role}: ${data.leader}`;
+    popupEmail.innerHTML = `E-mail: ${emailLinks(data.emails)}`;
+    popupPhone.innerHTML = `Telefone: ${phoneLinks(data.phones)}`;
+    popup.hidden = false;
+
+    const wrap = target.closest(".map-wrap").getBoundingClientRect();
+    const box = target.getBoundingClientRect();
+    const left = Math.max(14, Math.min(box.left - wrap.left + box.width / 2 - 150, wrap.width - 334));
+    const top = Math.max(72, Math.min(box.top - wrap.top + box.height / 2 - 60, wrap.height - 210));
+    popup.style.left = `${left}px`;
+    popup.style.top = `${top}px`;
+}
+
+regions.forEach((region) => {
+    region.addEventListener("click", () => selectBasin(region.dataset.basin, region));
+    region.addEventListener("keydown", (event) => {
+        if (event.key === "Enter" || event.key === " ") {
+            event.preventDefault();
+            selectBasin(region.dataset.basin, region);
+        }
+    });
+});
+
+closePopup.addEventListener("click", () => {
+    popup.hidden = true;
+});
+
+selectBasin("mearim", document.querySelector('[data-basin="mearim"]'));
+
+document.querySelectorAll("[data-carousel]").forEach((carousel) => {
+    const track = carousel.querySelector(".carousel-track");
+    const slides = Array.from(carousel.querySelectorAll(".carousel-slide"));
+    const prev = carousel.querySelector(".prev");
+    const next = carousel.querySelector(".next");
+    const dotsWrap = carousel.parentElement.querySelector(".carousel-dots");
+    let index = 0;
+
+    function render() {
+        track.style.transform = `translateX(-${index * 100}%)`;
+        dotsWrap.querySelectorAll(".carousel-dot").forEach((dot, dotIndex) => {
+            dot.classList.toggle("active", dotIndex === index);
+            dot.setAttribute("aria-current", dotIndex === index ? "true" : "false");
+        });
+    }
+
+    slides.forEach((_, slideIndex) => {
+        const dot = document.createElement("button");
+        dot.type = "button";
+        dot.className = "carousel-dot";
+        dot.setAttribute("aria-label", `Mostrar imagem ${slideIndex + 1}`);
+        dot.addEventListener("click", () => {
+            index = slideIndex;
+            render();
+        });
+        dotsWrap.appendChild(dot);
+    });
+
+    prev.addEventListener("click", () => {
+        index = (index - 1 + slides.length) % slides.length;
+        render();
+    });
+
+    next.addEventListener("click", () => {
+        index = (index + 1) % slides.length;
+        render();
+    });
+
+    render();
+});
+</script>
+
+</body>
+</html>
