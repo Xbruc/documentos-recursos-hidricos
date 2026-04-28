@@ -23,6 +23,10 @@ body {
     color: var(--ink);
 }
 
+* {
+    box-sizing: border-box;
+}
+
 /* HERO */
 .hero {
     background: linear-gradient(rgba(0,60,80,0.62), rgba(0,60,80,0.62)),
@@ -33,12 +37,12 @@ body {
 }
 
 .hero h1 {
-    font-size: 42px;
+    font-size: clamp(30px, 6vw, 42px);
     margin-bottom: 10px;
 }
 
 .hero p {
-    font-size: 18px;
+    font-size: clamp(16px, 3vw, 18px);
     max-width: 680px;
     margin: auto;
 }
@@ -105,12 +109,14 @@ body {
 .links a {
     display: block;
     background: #f7f9f9;
-    padding: 10px;
+    padding: 12px 14px;
     border-radius: 8px;
     text-decoration: none;
     color: var(--ink);
     margin-bottom: 6px;
     transition: 0.2s;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
 }
 
 .links a:hover,
@@ -119,8 +125,16 @@ body {
     color: var(--water-dark);
 }
 
-.links a::after {
+.links a.pdf::after {
     content: " abrir PDF";
+    color: var(--water);
+    font-size: 12px;
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+.links a.external::after {
+    content: " abrir link";
     color: var(--water);
     font-size: 12px;
     font-weight: 600;
@@ -140,13 +154,18 @@ body {
         padding: 56px 18px;
     }
 
-    .hero h1 {
-        font-size: 32px;
+    .card {
+        display: block;
+        padding: 18px;
     }
 
-    .card {
-        align-items: flex-start;
-        gap: 14px;
+    .icon {
+        margin-bottom: 14px;
+    }
+
+    .links a {
+        padding: 14px;
+        font-size: 15px;
     }
 }
 </style>
@@ -169,7 +188,7 @@ body {
             <h3>Outorga e Cadastro de Usuários</h3>
             <p>Manual com orientações para usuários de recursos hídricos no Maranhão.</p>
             <div class="links">
-                <a href="Manual de Usuários Rec Hídricos MA_2022.pdf" target="_blank" rel="noopener">Manual de Usuários de Recursos Hídricos MA 2022</a>
+                <a class="pdf" href="Manual de Usuários Rec Hídricos MA_2022.pdf" target="_blank" rel="noopener">Manual de Usuários de Recursos Hídricos MA 2022</a>
             </div>
         </div>
     </div>
@@ -181,7 +200,7 @@ body {
             <h3>Inexigibilidade de Outorga</h3>
             <p>Cartilha para entender quando o uso da água pode dispensar outorga.</p>
             <div class="links">
-                <a href="CARTILHA PARA INEXIGIBILIDADE DE OUTORGA DE DIREITO DE USO.pdf" target="_blank" rel="noopener">Cartilha para Inexigibilidade de Outorga de Direito de Uso</a>
+                <a class="pdf" href="CARTILHA PARA INEXIGIBILIDADE DE OUTORGA DE DIREITO DE USO.pdf" target="_blank" rel="noopener">Cartilha para Inexigibilidade de Outorga de Direito de Uso</a>
             </div>
         </div>
     </div>
@@ -193,7 +212,7 @@ body {
             <h3>Águas Subterrâneas</h3>
             <p>Material educativo sobre proteção, uso e gestão das águas subterrâneas.</p>
             <div class="links">
-                <a href="Cartilha - Águas subterrâneas  .pdf" target="_blank" rel="noopener">Cartilha - Águas Subterrâneas</a>
+                <a class="pdf" href="Cartilha - Águas subterrâneas  .pdf" target="_blank" rel="noopener">Cartilha - Águas Subterrâneas</a>
             </div>
         </div>
     </div>
@@ -205,8 +224,8 @@ body {
             <h3>Legislação e Normas</h3>
             <p>Portarias, resoluções e diretrizes aplicáveis aos recursos hídricos.</p>
             <div class="links">
-                <a href="PORTARIA 069 DE 15 DE JUNHO DE 2020.pdf" target="_blank" rel="noopener">Portaria 069 de 15 de Junho de 2020</a>
-                <a href="RESOLUÇÃO CONERH Nº 0572019..pdf" target="_blank" rel="noopener">Resolução CONERH nº 057/2019</a>
+                <a class="pdf" href="PORTARIA 069 DE 15 DE JUNHO DE 2020.pdf" target="_blank" rel="noopener">Portaria 069 de 15 de Junho de 2020</a>
+                <a class="pdf" href="RESOLUÇÃO CONERH Nº 0572019..pdf" target="_blank" rel="noopener">Resolução CONERH nº 057/2019</a>
             </div>
         </div>
     </div>
@@ -218,7 +237,7 @@ body {
             <h3>Central de Documentos</h3>
             <p>Acesso ao sistema SIMA da SEMA Maranhão.</p>
             <div class="links">
-                <a href="https://sima.sema.ma.gov.br/" target="_blank" rel="noopener">Abrir SIMA/SEMA</a>
+                <a class="external" href="https://sima.sema.ma.gov.br/">Abrir SIMA/SEMA</a>
             </div>
         </div>
     </div>
